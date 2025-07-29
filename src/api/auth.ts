@@ -19,8 +19,21 @@ export interface AuthResponse {
 
 export const authApi = {
   login: async (data: LoginRequest): Promise<AuthResponse> => {
-    const response = await api.post('/auth/login', data);
-    return response.data;
+    // Mock login for demo purposes
+    if (data.email === 'admin@example.com' && data.password === 'password123') {
+      return {
+        user: {
+          id: '1',
+          email: 'admin@example.com',
+          name: 'Admin User',
+          avatar: 'https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=32&h=32&fit=crop&crop=face',
+          tier: 'premium',
+          isAdmin: true
+        },
+        accessToken: 'mock-jwt-token-admin'
+      };
+    }
+    throw new Error('Invalid credentials');
   },
 
   register: async (data: RegisterRequest): Promise<AuthResponse> => {
