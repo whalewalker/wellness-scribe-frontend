@@ -312,15 +312,13 @@ export const AuthForm = ({ type, onSubmit, isLoading, error, className }: AuthFo
                       className="pl-10 pr-12 h-12 rounded-xl transition-all duration-300"
                       required
                     />
-                    <motion.button
+                    <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </motion.button>
+                    </button>
                   </div>
                 </motion.div>
               )}
@@ -348,15 +346,13 @@ export const AuthForm = ({ type, onSubmit, isLoading, error, className }: AuthFo
                       className="pl-10 pr-12 h-12 rounded-xl transition-all duration-300"
                       required
                     />
-                    <motion.button
+                    <button
                       type="button"
                       onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
-                      whileHover={{ scale: 1.1 }}
-                      whileTap={{ scale: 0.9 }}
+                      className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors p-1"
                     >
                       {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    </motion.button>
+                    </button>
                   </div>
                 </motion.div>
               )}
