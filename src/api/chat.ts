@@ -1,69 +1,118 @@
 import api from '../lib/axios';
 
-export interface Message {
-  id: string;
+export interface MessageDto {
+  role: 'user' | 'assistant' | 'system';
   content: string;
-  role: 'user' | 'assistant';
   timestamp: Date;
-  tokens?: number;
+  metadata?: {
+    tokens?: number;
+    model?: string;
+    processingTime?: number;
+  };
 }
 
-export interface ChatRequest {
+export interface ChatContextDto {
+  wellnessGoals?: string[];
+  healthConditions?: string[];
+  medications?: string[];
+  lifestyle?: string;
+}
+
+export interface SendMessageDto {
+  content: string;
+  chatId?: string;
+  tags?: string[];
+  context?: ChatContextDto;
+}
+
+export interface ChatResponseDto {
+  id: string;
+  title: string;
+  messages: MessageDto[];
+  context?: ChatContextDto;
+  status: string;
+  tags: string[];
+  summary?: string;
+  totalTokens: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface ChatListResponseDto {
+  id: string;
+  title: string;
+  status: string;
+  tags: string[];
+  summary?: string;
+  totalTokens: number;
+  createdAt: Date;
+  updatedAt: Date;
+}
+
+export interface UpdateChatDto {
+  title?: string;
+  tags?: string[];
+  status?: 'active' | 'archived' | 'deleted';
+}
+
+export interface StopChatDto {
+  chatId: string;
+  reason?: string;
+}
+
+export interface StopGenerationDto {
+  chatId: string;
+}
+
+export interface ChatMessageResponseDto {
   message: string;
-  voice?: boolean;
 }
 
-export interface ChatResponse {
-  reply: string;
-  tokens: number;
-  messageId: string;
+export interface SummaryResponseDto {
+  summary: string;
 }
+
+export interface Message extends MessageDto {}
+export interface ChatConversation extends ChatResponseDto {}
 
 export const chatApi = {
-  sendMessage: async (data: ChatRequest): Promise<ChatResponse> => {
-    const response = await api.post('/chat', data);
+  sendMessage: async (data: SendMessageDto): Promise<ChatResponseDto> => {
+    const response = await api.post('/chat/message', data);
     return response.data;
   },
 
-  getChatHistory: async (limit = 50): Promise<Message[]> => {
-    const response = await api.get(`/chat/history?limit=${limit}`);
+  stopChat: async (data: StopChatDto): Promise<ChatMessageResponseDto> => {
+    const response = await api.post('/chat/stop', data);
     return response.data;
   },
 
-  deleteMessage: async (messageId: string): Promise<void> => {
-    await api.delete(`/chat/messages/${messageId}`);
+  stopGeneration: async (data: StopGenerationDto): Promise<ChatMessageResponseDto> => {
+    const response = await api.post('/chat/stop-generation', data);
+    return response.data;
   },
 
-  clearHistory: async (): Promise<void> => {
-    await api.delete('/chat/history');
+  getChats: async (): Promise<ChatListResponseDto[]> => {
+    const response = await api.get('/chat');
+    return response.data;
   },
 
-  // Streaming chat (for real-time responses)
-  streamMessage: (
-    data: ChatRequest, 
-    onChunk: (chunk: string) => void,
-    onComplete: (response: ChatResponse) => void,
-    onError: (error: Error) => void
-  ) => {
-    // This would typically use EventSource or WebSocket
-    // For now, simulate streaming with setTimeout
-    let fullResponse = '';
-    const mockResponse = "I'm here to help you with your wellness journey. How can I assist you today?";
-    
-    const words = mockResponse.split(' ');
-    words.forEach((word, index) => {
-      setTimeout(() => {
-        fullResponse += (index === 0 ? '' : ' ') + word;
-        onChunk(fullResponse);
-        
-        if (index === words.length - 1) {
-          onComplete({
-            reply: fullResponse,
-            tokens: words.length * 4, // rough token estimate
-            messageId: Date.now().toString(),
-          });
-        }
-      }, index * 100);
-    });
+  getChat: async (chatId: string): Promise<ChatResponseDto> => {
+    const response = await api.get(`/chat/${chatId}`);
+    return response.data;
+  },
+
+  updateChat: async (chatId: string, data: UpdateChatDto): Promise<ChatResponseDto> => {
+    const response = await api.put(`/chat/${chatId}`, data);
+    return response.data;
+  },
+
+  deleteChat: async (chatId: string): Promise<ChatMessageResponseDto> => {
+    const response = await api.delete(`/chat/${chatId}`);
+    return response.data;
+  },
+
+  generateSummary: async (chatId: string): Promise<SummaryResponseDto> => {
+    const response = await api.post(`/chat/${chatId}/summary`);
+    return response.data;
   },
 };

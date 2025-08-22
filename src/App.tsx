@@ -10,6 +10,9 @@ import { Register } from "./pages/Register";
 import { ForgotPassword } from "./pages/ForgotPassword";
 import { ResetPassword } from "./pages/ResetPassword";
 import { Chat } from "./pages/Chat";
+import WellnessCoaching from "./pages/WellnessCoaching";
+import { Documents } from "./pages/Documents";
+import { DocumentView } from "./pages/DocumentView";
 import { Subscribe } from "./pages/Subscribe";
 import { Settings } from "./pages/Settings";
 import { Admin } from "./pages/Admin";
@@ -38,6 +41,30 @@ const App = () => {
             element={
               <ProtectedRoute>
                 <Chat />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/wellness-coaching" 
+            element={
+              <ProtectedRoute>
+                <WellnessCoaching />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/documents" 
+            element={
+              <ProtectedRoute>
+                <Documents />
+              </ProtectedRoute>
+            } 
+          />
+          <Route 
+            path="/documents/:id" 
+            element={
+              <ProtectedRoute>
+                <DocumentView />
               </ProtectedRoute>
             } 
           />

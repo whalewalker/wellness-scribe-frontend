@@ -6,7 +6,7 @@ const API_BASE_URL = process.env.NODE_ENV === 'production'
 
 // Create axios instance
 export const api = axios.create({
-  baseURL: `${API_BASE_URL}/api`,
+  baseURL: API_BASE_URL,
   headers: {
     'Content-Type': 'application/json',
   },
@@ -31,10 +31,11 @@ api.interceptors.response.use(
   (response) => response,
   async (error) => {
     if (error.response?.status === 401) {
-      // Auto-logout on 401
+      // Auto-logout on 401 - let the auth store handle the redirect
       localStorage.removeItem('accessToken');
       localStorage.removeItem('user');
-      window.location.href = '/login';
+      // Don't use window.location.href as it causes page reload
+      // The auth store or components should handle the redirect
     }
     return Promise.reject(error);
   }

@@ -4,9 +4,17 @@ import { persist } from 'zustand/middleware';
 export interface User {
   id: string;
   email: string;
-  name: string;
+  firstName: string;
+  lastName: string;
+  role: string;
+  profilePicture?: string;
+  isEmailVerified: boolean;
+  lastLoginAt?: string;
+  createdAt: string;
+  // Computed properties for backward compatibility
+  name?: string;
   avatar?: string;
-  tier: 'free' | 'premium' | 'business';
+  tier?: 'free' | 'premium' | 'business';
   isAdmin?: boolean;
 }
 
@@ -32,9 +40,22 @@ export const useAuthStore = create<AuthState>()(
       isLoading: false,
 
       setAuth: (user, token) => {
+        console.log('Setting auth with user:', user, 'token:', token);
+        
+        // Add computed properties for backward compatibility
+        const userWithComputed = {
+          ...user,
+          name: `${user.firstName} ${user.lastName}`,
+          avatar: user.profilePicture,
+          tier: 'free' as const, // Default tier
+          isAdmin: user.role === 'admin',
+        };
+        
+        console.log('User with computed properties:', userWithComputed);
+        
         localStorage.setItem('accessToken', token);
         set({ 
-          user, 
+          user: userWithComputed, 
           accessToken: token, 
           isAuthenticated: true,
           isLoading: false 
@@ -42,19 +63,30 @@ export const useAuthStore = create<AuthState>()(
       },
 
       logout: () => {
+        console.log('Logging out');
         localStorage.removeItem('accessToken');
+        localStorage.removeItem('user');
         set({ 
           user: null, 
           accessToken: null, 
           isAuthenticated: false,
           isLoading: false 
         });
+        
+        // Use React Router navigation instead of window.location
+        // This will be handled by the ProtectedRoute component
       },
 
       updateUser: (updates) => {
         const currentUser = get().user;
         if (currentUser) {
-          set({ user: { ...currentUser, ...updates } });
+          const updatedUser = { ...currentUser, ...updates };
+          // Recompute computed properties
+          updatedUser.name = `${updatedUser.firstName} ${updatedUser.lastName}`;
+          updatedUser.avatar = updatedUser.profilePicture;
+          updatedUser.isAdmin = updatedUser.role === 'admin';
+          
+          set({ user: updatedUser });
         }
       },
 

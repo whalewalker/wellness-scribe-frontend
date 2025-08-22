@@ -12,7 +12,8 @@ export const Register = () => {
   const { setAuth } = useAuthStore();
 
   const handleRegister = async (data: { 
-    name: string; 
+    firstName: string;
+    lastName: string;
     email: string; 
     password: string; 
     confirmPassword: string 
@@ -26,14 +27,14 @@ export const Register = () => {
     setError('');
 
     try {
-      const response = await authApi.register({
-        name: data.name,
+      await authApi.register({
+        firstName: data.firstName,
+        lastName: data.lastName,
         email: data.email,
         password: data.password,
       });
-      setAuth(response.user, response.accessToken);
-      toast.success('Account created successfully!');
-      navigate('/chat');
+      toast.success('Account created successfully! Please sign in to continue.');
+      navigate('/login');
     } catch (err: any) {
       setError(err.response?.data?.message || 'Registration failed. Please try again.');
     } finally {

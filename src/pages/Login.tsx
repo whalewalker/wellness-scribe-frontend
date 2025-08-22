@@ -18,13 +18,31 @@ export const Login = () => {
     setIsLoading(true);
     setError('');
 
+    console.log('Login data:', data);
+
     try {
       const response = await authApi.login(data);
-      setAuth(response.user, response.accessToken);
+      console.log('Login response:', response);
+      
+      // Ensure we have the required fields
+      if (!response.user) {
+        throw new Error('User data missing from server response');
+      }
+      
+      if (!response.access_token) {
+        throw new Error('Access token missing from server response');
+      }
+      
+      setAuth(response.user, response.access_token);
       toast.success('Welcome back!');
-      navigate(from, { replace: true });
+      
+      // Add a small delay to ensure auth state is properly set
+      setTimeout(() => {
+        navigate(from, { replace: true });
+      }, 100);
     } catch (err: any) {
-      setError(err.response?.data?.message || 'Login failed. Please try again.');
+      console.error('Login error:', err);
+      setError(err.response?.data?.message || err.message || 'Login failed. Please try again.');
     } finally {
       setIsLoading(false);
     }

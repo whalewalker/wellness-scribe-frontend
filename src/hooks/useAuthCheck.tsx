@@ -3,11 +3,18 @@ import { useAuthStore } from '../store/authStore';
 import { authApi } from '../api/auth';
 
 export const useAuthCheck = () => {
-  const { setAuth, logout, setLoading } = useAuthStore();
+  const { setAuth, logout, setLoading, isAuthenticated, user } = useAuthStore();
 
   useEffect(() => {
     const checkAuth = async () => {
       const token = localStorage.getItem('accessToken');
+      
+      // If we already have a user and token, don't re-check
+      if (isAuthenticated && user && token) {
+        setLoading(false);
+        return;
+      }
+      
       if (!token) {
         setLoading(false);
         return;
@@ -15,7 +22,7 @@ export const useAuthCheck = () => {
 
       try {
         setLoading(true);
-        const user = await authApi.me();
+        const user = await authApi.getProfile();
         setAuth(user, token);
       } catch (error) {
         console.error('Auth check failed:', error);
@@ -26,5 +33,5 @@ export const useAuthCheck = () => {
     };
 
     checkAuth();
-  }, [setAuth, logout, setLoading]);
+  }, [setAuth, logout, setLoading, isAuthenticated, user]);
 };
